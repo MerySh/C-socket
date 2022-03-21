@@ -10,10 +10,28 @@
 
 #define MAX_CLIENTS 5
 
-int main(int argc, char **argv){
-    // checking if user inputs the port
-    if (argc != 2){
-        printf("No port was given.\nPlease write: ./server <port>\n");
+int main() {
+    char buff[256];
+    printf("For connecting to server please write :connect <PORT>.\n");
+    fgets(buff, sizeof(buff), stdin);
+    char newStr[10][20];
+
+    int j = 0, k = 0;
+    for (int i = 0; i <= strlen(buff); ++i) {
+        if (buff[i] != ' ') {
+            newStr[k][j++] = buff[i];
+        } else {
+            newStr[k][j++] = '\0';
+            ++k;
+            j = 0;
+        }
+        if (buff[i] == '\0') {
+            break;
+        }   
+    }
+
+    if (!strcmp(newStr[1], "")) {
+        printf("No command found.\n");
         exit(1);
     }
 
@@ -24,11 +42,13 @@ int main(int argc, char **argv){
         exit(1);
     }
 
-    char buff[256];
-    while (fgets(buff, 256, fp)) {
-        if (strcmp(argv[1], buff)) {
+    char buff2[256];
+    while (fgets(buff2, 256, fp)) {
+        if (strcmp(newStr[1], buff2)) {
             printf("This port is not active.\n");
             exit(1);
+        } else if (strcmp(newStr[0], ":connect") == 0) {
+            printf("Server found.\n");
         }
     }
     fclose(fp);
@@ -41,7 +61,7 @@ int main(int argc, char **argv){
         exit(0);
     }
 
-    int port = atoi(argv[1]); // Converting string to an integer
+    int port = atoi(newStr[1]); // Converting string to an integer
     
     // creating a socket
     int listening = socket(AF_INET, SOCK_STREAM, 0);
@@ -63,7 +83,7 @@ int main(int argc, char **argv){
         exit(1);
     }
     
-    printf("Connected to the server\n");
+    printf("Connected to the server.\n");
 
     // after everything is okay
     char buffer[2048];
